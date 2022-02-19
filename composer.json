@@ -1,0 +1,26 @@
+{
+    "name": "payid19/payid19-api-php",
+    "version": "1",
+    "description": "Payid19 API library for PHP",
+    "type": "library",
+    "keywords": [
+        "payid19",
+        "merchant",
+        "payment",
+        "gateway",
+        "bitcoin",
+        "usdt",
+        "tether",
+    ],
+    "license": "MIT",
+    "homepage": "https://payid19.com",
+    "require": {
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Payid19\\": "src/"
+        }
+    }
+}
