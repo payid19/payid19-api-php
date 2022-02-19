@@ -10,7 +10,8 @@
         "gateway",
         "bitcoin",
         "usdt",
-        "tether"
+        "tether",
+        'paymentgateway"
     ],
     "license": "MIT",
     "homepage": "https://payid19.com",
