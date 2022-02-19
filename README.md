@@ -18,15 +18,12 @@ Usage example:
 New invoice:
 
 ```
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
 $public_key  = 'xxxxx';
 $private_key = 'xxxxx';
 
 $payid19 = new \Payid19\ClientAPI($public_key,$private_key);
-
-
-```
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
 
 $post = [
                     'public_key' => 'yourpublickey',
@@ -48,5 +45,4 @@ $post = [
 ];
 
 $link = $payid19->create_invoice($request);
-
 ```
