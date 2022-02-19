@@ -1,6 +1,6 @@
 ## Payid19 PHP API library
 
-To start accept cryptocurrencies on your site you need to create an account on <https://payid19.com> and get Public and private keys under Settings page.
+To start accept cryptocurrencies on your site you need to create an account on <https://payid19.com> and get Public and Private keys on Settings page.
 
 This secret key will be used for creating instance of the Payid19Client.
 
