@@ -43,7 +43,7 @@ $post = [
                     'expiration_date' => 48
 ];
 
-$result= $plisio->create_invoice($request);
+$result= $payid19->create_invoice($request);
 
 if(json_decode($result)->status=='error'){
 		//error
@@ -65,6 +65,6 @@ $request= [
 		'order_id' 			=> '11'
 ];
     
-$result= $plisio->get_invoices($request);
+$result= $payid19->get_invoices($request);
 print_r($result);
 ```
