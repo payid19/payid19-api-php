@@ -16,7 +16,7 @@ composer require payid19/payid19-api-php
 
 Usage example:
 
-New invoice:
+New invoice:  (<https://payid19.com/dev/invoices/create_invoice>)
 
 ```
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
@@ -43,5 +43,28 @@ $post = [
                     'expiration_date' => 48
 ];
 
-$link = $payid19->create_invoice($request);
+$result= $plisio->create_invoice($request);
+
+if(json_decode($result)->status=='error'){
+		//error
+		echo json_decode($result)->message[0];
+}else{
+		//success echo url
+		echo json_decode($result)->message;
+}
+```
+
+Get invoices: (<https://payid19.com/dev/invoices/get_invoices>)
+```
+$public_key  = 'xxxxx';
+$private_key = 'xxxxx';
+
+$payid19 = new \Payid19\ClientAPI($public_key,$private_key);
+    
+$request= [
+		'order_id' 			=> '11'
+];
+    
+$result= $plisio->get_invoices($request);
+print_r($result);
 ```
