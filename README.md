@@ -26,7 +26,7 @@ $private_key = 'xxxxx';
 
 $payid19 = new \Payid19\ClientAPI($public_key,$private_key);
 
-$post = [
+$request = [
                     'email' => 'email@email.com',
                     'price_amount' => 725,
                     'price_currency' => 'USD',
