@@ -11,7 +11,8 @@
         "bitcoin",
         "usdt",
         "tether",
-        "paymentgateway"
+        "paymentgateway",
+        "laravel"
     ],
     "license": "MIT",
     "homepage": "https://payid19.com",
