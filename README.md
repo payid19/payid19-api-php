@@ -1,4 +1,6 @@
-## Payid19 PHP API library
+## Payid19 Crypto Payment Gateway PHP API library
+
+Accept USDT Payment with Payid19
 
 To start accept cryptocurrencies on your site you need to create an account on <https://payid19.com> and get Public and Private keys on Settings page.
 
