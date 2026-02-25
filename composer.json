@@ -1,6 +1,5 @@
 {
     "name": "payid19/payid19-api-php",
-    "version": "1",
     "description": "Payid19 API library for PHP",
     "type": "library",
     "keywords": [
@@ -17,6 +16,7 @@
     "license": "MIT",
     "homepage": "https://payid19.com",
     "require": {
+        "php": ">=7.4",
         "ext-curl": "*",
         "ext-json": "*"
     },
@@ -24,5 +24,6 @@
         "psr-4": {
             "Payid19\\": "src/"
         }
-    }
+    },
+    "minimum-stability": "stable"
 }
