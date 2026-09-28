@@ -4,6 +4,26 @@ namespace Payid19;
 
 class ClientAPI
 {
+    /**
+     * Designs available for the hosted payment page.
+     *
+     * Pass one as the 'template' parameter of create_invoice(); the returned
+     * payment URL then points at that design, e.g.
+     * https://payid19.com/invoice/{alias}/paper
+     */
+    public const TEMPLATE_CLASSIC = 'classic';
+    public const TEMPLATE_SLATE   = 'slate';
+    public const TEMPLATE_PAPER   = 'paper';
+    public const TEMPLATE_MINT    = 'mint';
+
+    /** @var string[] All templates known to this library version. */
+    public const TEMPLATES = [
+        self::TEMPLATE_CLASSIC,
+        self::TEMPLATE_SLATE,
+        self::TEMPLATE_PAPER,
+        self::TEMPLATE_MINT,
+    ];
+
     protected string $public_key  = '';
     protected string $private_key = '';
     public string $apiEndPoint    = 'https://payid19.com/api/v1';
@@ -29,6 +49,9 @@ class ClientAPI
 
     /**
      * Creates a new invoice.
+     *
+     * Optionally accepts a 'template' key to pick the payment page design —
+     * see the TEMPLATE_* constants. Omitting it keeps the classic page.
      *
      * @param  array<string,mixed> $req
      * @return string JSON encoded response
