@@ -51,6 +51,7 @@ $result = $payid19->create_invoice([
     'cancel_url'       => 'https://yoursite.com/payment/cancel',
     'callback_url'     => 'https://yoursite.com/payment/callback',
     'expiration_date'  => 48, // hours
+    'template'         => 'slate', // payment page design, see below
     // 'test'          => 1,  // uncomment to use test mode
 ]);
 
@@ -62,6 +63,40 @@ if ($response->status === 'error') {
     // Redirect customer to payment page
     header('Location: ' . $response->message);
 }
+```
+
+### Payment Page Templates
+
+The hosted payment page comes in four designs. Pass the one you want as
+`template`; the returned URL points at that design, e.g.
+`https://payid19.com/invoice/{alias}/paper`.
+
+- `classic` — the default page, used when `template` is omitted
+- `slate`
+- `paper`
+- `mint`
+
+Every design supports the same coins, networks and underpayment handling —
+only the look differs.
+
+```php
+$result = $payid19->create_invoice([
+    'price_amount' => 100,
+    'order_id'     => 42,
+    'template'     => \Payid19\ClientAPI::TEMPLATE_MINT,
+]);
+```
+
+Class constants are available so your editor can autocomplete them and typos
+fail at compile time rather than at the API:
+
+```php
+\Payid19\ClientAPI::TEMPLATE_CLASSIC  // 'classic'
+\Payid19\ClientAPI::TEMPLATE_SLATE    // 'slate'
+\Payid19\ClientAPI::TEMPLATE_PAPER    // 'paper'
+\Payid19\ClientAPI::TEMPLATE_MINT     // 'mint'
+
+\Payid19\ClientAPI::TEMPLATES         // all of the above, as an array
 ```
 
 ### Get Invoices
@@ -122,6 +157,7 @@ class PaymentController extends Controller
             'price_currency' => 'USD',
             'order_id'       => 123,
             'title'          => 'Order #123',
+            'template'       => ClientAPI::TEMPLATE_SLATE,
             'success_url'    => route('payment.success'),
             'cancel_url'     => route('payment.cancel'),
             'callback_url'   => route('payment.callback'),
