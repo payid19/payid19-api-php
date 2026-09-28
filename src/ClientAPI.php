@@ -73,6 +73,54 @@ class ClientAPI
     }
 
     /**
+     * Lists the coins and networks that can be used for payment.
+     *
+     * @see    https://payid19.com/dev/tools/get_coins
+     * @param  array<string,mixed> $req
+     * @return string JSON encoded response
+     */
+    public function get_coins(array $req = []): string
+    {
+        return $this->apiCall('get_coins', $req);
+    }
+
+    /**
+     * Converts an amount between a fiat currency and a coin at the current rate.
+     *
+     * @see    https://payid19.com/dev/tools/get_estimate
+     * @param  array<string,mixed> $req
+     * @return string JSON encoded response
+     */
+    public function get_estimate(array $req): string
+    {
+        return $this->apiCall('get_estimate', $req);
+    }
+
+    /**
+     * Returns the balance of your account.
+     *
+     * @see    https://payid19.com/dev/withdraws/get_balance
+     * @param  array<string,mixed> $req
+     * @return string JSON encoded response
+     */
+    public function get_balance(array $req = []): string
+    {
+        return $this->apiCall('get_balance', $req);
+    }
+
+    /**
+     * Creates a withdrawal request.
+     *
+     * @see    https://payid19.com/dev/withdraws/create_withdraw
+     * @param  array<string,mixed> $req
+     * @return string JSON encoded response
+     */
+    public function create_withdraw(array $req): string
+    {
+        return $this->apiCall('create_withdraw', $req);
+    }
+
+    /**
      * Sends an API request and returns a JSON encoded response string.
      *
      * @param  array<string,mixed> $req
