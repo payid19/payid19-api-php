@@ -50,7 +50,6 @@ $result = $payid19->create_invoice([
     'success_url'      => 'https://yoursite.com/payment/success',
     'cancel_url'       => 'https://yoursite.com/payment/cancel',
     'callback_url'     => 'https://yoursite.com/payment/callback',
-    'expiration_date'  => 48, // hours
     'template'         => 'slate', // payment page design, see below
     // 'test'          => 1,  // uncomment to use test mode
 ]);
@@ -64,6 +63,32 @@ if ($response->status === 'error') {
     header('Location: ' . $response->message);
 }
 ```
+
+#### Parameters
+
+Only `price_amount` is required; everything else is optional.
+
+| Parameter | Type | Notes |
+|---|---|---|
+| `price_amount` | decimal | **Required.** Price in `price_currency`. Minimum `0.0001`. |
+| `price_currency` | string | Defaults to `USD`. EUR, GBP, TRY and 150+ local currencies are accepted — conversion to crypto happens when the customer opens the page. |
+| `add_fee_to_price` | int | `1` passes the platform commission on to the customer, so you receive the full `price_amount`. Enabled automatically under ~0.20 USD. |
+| `margin_ratio` | decimal | Underpayment tolerance in USDT. With `1` on a 5 USDT invoice, 4 USDT still completes the payment. Minimum `0.01`. Useful because wallets often deduct the network fee from the amount the customer types. |
+| `order_id` | string | Your order reference, echoed back in the callback and searchable via `get_invoices()`. Max 100 chars. |
+| `merchant_id` | string | Your merchant reference, echoed back in the callback. Max 150 chars. |
+| `customer_id` | int | Your customer reference, echoed back in the callback. Max 11 digits. |
+| `email` | string | Buyer's email. If omitted, the customer enters it on the payment page. |
+| `title` | string | Shown at the top of the payment page. Max 150 chars. |
+| `description` | string | Shown under the title. Up to 300 chars accepted, only the first 180 are stored and displayed. |
+| `banned_coins` | JSON | Coins to hide, as a JSON array. `["BTC","ETH"]` hides them everywhere; `["USDT-ERC20"]` hides only that network. |
+| `callback_url` | URL | Where the payment result is POSTed. Must be a public domain — no IPs, no localhost. Max 300 chars. |
+| `success_url` | URL | Redirect after a successful payment. Cosmetic only — see the callback section. Max 300 chars. |
+| `cancel_url` | URL | Redirect if the customer cancels. Max 300 chars. |
+| `template` | string | Payment page design — see below. |
+| `test` | int | `1` creates a test invoice that completes itself within seconds, callback included, with no real payment. |
+| `white_label` | int | `1` returns a JSON coin list instead of a page URL, so you can build the checkout under your own brand. |
+| `referral` | numeric | Your 10-digit referral ID. Earns you half of the Payid19 commission on every payment that invoice receives. |
+| `expiration_date` | int | Accepted for backwards compatibility only. Invoices are currently valid for **24 hours** regardless of the value sent. |
 
 ### Payment Page Templates
 
@@ -113,6 +138,69 @@ $result = $payid19->get_invoices([
 $response = json_decode($result);
 print_r($response);
 ```
+
+### Coins and Estimates
+
+```php
+// Coins and networks available for payment
+$coins = json_decode($payid19->get_coins());
+
+// Convert between a fiat amount and a coin at the current rate
+$estimate = json_decode($payid19->get_estimate([
+    // see the docs below for the parameter list
+]));
+```
+
+> https://payid19.com/dev/tools/get_coins &middot; https://payid19.com/dev/tools/get_estimate
+
+### Withdrawals
+
+```php
+// Your account balance
+$balance = json_decode($payid19->get_balance());
+
+// Request a withdrawal
+$withdraw = json_decode($payid19->create_withdraw([
+    // see the docs below for the parameter list
+]));
+```
+
+> https://payid19.com/dev/withdraws/get_balance &middot; https://payid19.com/dev/withdraws/create_withdraw
+
+## Payment Callback
+
+When an invoice is **paid**, Payid19 POSTs a JSON body to your `callback_url`.
+Callbacks are sent for completed payments only — receiving one means the
+invoice is paid; pending and expired invoices produce nothing.
+
+The payload carries `privatekey`, Payid19's invoice `id`, your `order_id` /
+`merchant_id` / `customer_id` unchanged, the requested `price_amount` and
+`price_currency`, the `amount` and `amount_currency` actually paid, and a full
+snapshot of the invoice (`user_id`, `email`, `title`, `description`, `ip`,
+`test`, `created_at` and the rest), so a follow-up API call is rarely needed.
+
+```php
+$data = json_decode(file_get_contents('php://input'));
+
+if ($data->privatekey !== 'YOUR_PRIVATE_KEY') {
+    http_response_code(403);
+    exit;
+}
+
+// Payment confirmed — mark order $data->order_id as paid
+http_response_code(200);
+```
+
+Four things worth getting right:
+
+- **Verify `privatekey`** against your own copy before trusting a callback.
+  Do *not* filter by sender IP — callbacks arrive from several addresses.
+- **Respond with 2xx.** A non-2xx response is retried, up to 3 delivery
+  attempts in total.
+- **Be idempotent.** Because of those retries the same callback can arrive
+  more than once; marking an already-paid order as paid again must be harmless.
+- **Never treat `success_url` as proof of payment** — a customer can open that
+  URL by hand. The callback is the single source of truth.
 
 ## Laravel Integration
 
@@ -174,10 +262,13 @@ class PaymentController extends Controller
 
     public function callback(Request $request)
     {
-        // Handle payment notification from Payid19
-        $data = $request->all();
+        // Verify the callback really came from Payid19
+        if ($request->input('privatekey') !== env('PAYID19_PRIVATE_KEY')) {
+            return response('Forbidden', 403);
+        }
 
-        // Find order by $data['order_id'] and update payment status
+        // Find order by $request->input('order_id') and mark it as paid.
+        // Keep this idempotent — a callback can be delivered more than once.
         // ...
 
         return response('OK', 200);
