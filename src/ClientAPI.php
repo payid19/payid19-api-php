@@ -168,7 +168,17 @@ class ClientAPI
             return $this->errorResponse('API returned an empty response.');
         }
 
-        // Non-2xx HTTP status code
+        $decoded = json_decode($result, true);
+
+        // API errors arrive with HTTP 421 and a readable message array, so the
+        // body is inspected before the status code. Checking the status first
+        // would replace every reason the API gives ('Wrong public or private
+        // key.') with the status code alone.
+        if (is_array($decoded) && ($decoded['status'] ?? null) === 'error') {
+            return $result;
+        }
+
+        // Non-2xx HTTP status code with no usable error body
         if ($httpCode < 200 || $httpCode >= 300) {
             return $this->errorResponse(
                 sprintf('API returned an unexpected HTTP status code: %d', $httpCode)
@@ -176,7 +186,6 @@ class ClientAPI
         }
 
         // Validate that the response is valid JSON before returning
-        json_decode($result);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return $this->errorResponse(
                 'API returned invalid JSON: ' . json_last_error_msg()
