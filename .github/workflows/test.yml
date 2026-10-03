@@ -1,0 +1,42 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 7.4 is the floor declared in composer.json, which nothing had
+        # verified until this workflow existed.
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, json
+          coverage: none
+          tools: composer:v2
+
+      # composer.lock is not committed, as is conventional for a library, so
+      # the dependency versions are resolved against the PHP running the job.
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Check the syntax of every source file
+        run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Run the test suite
+        run: vendor/bin/phpunit
