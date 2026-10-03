@@ -34,7 +34,7 @@ $payid19 = new \Payid19\ClientAPI('YOUR_PUBLIC_KEY', 'YOUR_PRIVATE_KEY');
 
 Creates a new payment invoice and returns a payment page URL.
 
-> Full parameter list: https://payid19.com/dev/invoices/create_invoice
+> Full parameter list: [payid19.com/dev/invoices/create_invoice](https://payid19.com/dev/invoices/create_invoice)
 
 ```php
 $result = $payid19->create_invoice([
@@ -128,7 +128,7 @@ fail at compile time rather than at the API:
 
 Retrieve existing invoices by order ID.
 
-> Full parameter list: https://payid19.com/dev/invoices/get_invoices
+> Full parameter list: [payid19.com/dev/invoices/get_invoices](https://payid19.com/dev/invoices/get_invoices)
 
 ```php
 $result = $payid19->get_invoices([
@@ -151,7 +151,7 @@ $estimate = json_decode($payid19->get_estimate([
 ]));
 ```
 
-> https://payid19.com/dev/tools/get_coins &middot; https://payid19.com/dev/tools/get_estimate
+> Parameters: [get_coins](https://payid19.com/dev/tools/get_coins) &middot; [get_estimate](https://payid19.com/dev/tools/get_estimate)
 
 ### Withdrawals
 
@@ -165,7 +165,7 @@ $withdraw = json_decode($payid19->create_withdraw([
 ]));
 ```
 
-> https://payid19.com/dev/withdraws/get_balance &middot; https://payid19.com/dev/withdraws/create_withdraw
+> Parameters: [get_balance](https://payid19.com/dev/withdraws/get_balance) &middot; [create_withdraw](https://payid19.com/dev/withdraws/create_withdraw)
 
 ## Payment Callback
 
